@@ -1,5 +1,5 @@
 {
-    "name": "vps-convert",
+    "name": "sub-convert",
     "type": "module",
     "version": "0.0.1",
     "private": true,
@@ -9,5 +9,21 @@
         "start": "wrangler dev",
         "cf-typegen": "wrangler types",
         "pages": "vite build"
+    },
+    "dependencies": {
+        "cloudflare-tools": "^0.1.1",
+        "js-yaml": "^4.1.0"
+    },
+    "devDependencies": {
+        "@cloudflare/workers-types": "^4.20241224.0",
+        "@jiangweiye/eslint-config": "^0.1.13",
+        "@jiangweiye/prettier-config": "^0.0.18",
+        "@jiangweiye/tsconfig": "^0.0.11",
+        "@types/js-yaml": "^4.0.9",
+        "@types/node": "^22.10.2",
+        "eslint": "^9.10.0",
+        "prettier": "^3.4.1",
+        "typescript": "^5.7.2",
+        "vite": "^6.0.1"
     }
 }
