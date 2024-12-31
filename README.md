@@ -17,9 +17,9 @@ a small tool that provides confusion conversion subscriptions
 | Trojan       | ✅   | 完全支持 |
 | Shadowsocks  | ✅   | 完全支持 |
 | ShadowsocksR | ✅   | 完全支持 |
-| Hysteria     | 🚧   | 开发中   |
-| Hysteria2    | 🚧   | 开发中   |
-| HY2          | 🚧   | 开发中   |
+| Hysteria     | ✅   | 完全支持   |
+| Hysteria2    | ✅   | 完全支持   |
+| HY2          | ✅   | 完全支持   |
 
 ### 📦 订阅格式转换支持
 
