@@ -110,6 +110,10 @@ CREATE TABLE IF NOT EXISTS short_url (
 );
 ```
 
+#### 💾 配置示例
+
+![配置示例](./src/doc/screen/env.png)
+
 #### 💾 数据库部署文档
 
 [Cloudflare D1](https://developers.cloudflare.com/d1/get-started/)
