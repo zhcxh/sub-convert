@@ -1,7 +1,8 @@
-export function getShortServeConfig(env: Env): { label: string; value: string }[] {
-    const shortServerArr = env.SHORT_SERVER?.split('\n').filter(Boolean) ?? [];
-    return shortServerArr.reduce<{ label: string; value: string }[]>((acc, cur) => {
-        acc.push({ label: cur, value: cur });
-        return acc;
-    }, []);
+export function getShortServeConfig(req: Request, env: Env): { label: string; value: string }[] {
+    if (env.DB === undefined) {
+        return [];
+    }
+    const { origin } = new URL(req.url);
+    return [{ label: origin, value: origin }];
 }
+

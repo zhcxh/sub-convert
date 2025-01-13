@@ -137,8 +137,6 @@ export function SubSelect(): string {
                     }
 
                     .sub-select__wrapper_disabled {
-                        background-color: #f5f7fa;
-                        border-color: #e4e7ed;
                         cursor: not-allowed;
                     }
 
@@ -446,6 +444,13 @@ export function SubSelect(): string {
                     const option = this.state.options.find(opt => opt.value === newValue);
                     if (option && input) {
                         input.value = option.label;
+                    }
+                } else if (name === 'disabled' && newValue !== oldValue) {
+                    const input = this.shadowRoot.querySelector('.sub-select__input');
+                    if (newValue) {
+                        input.disabled = true;
+                    } else {
+                        input.disabled = false;
                     }
                 }
             }

@@ -37,12 +37,12 @@ a small tool that provides confusion conversion subscriptions
 
 ### 环境变量配置
 
-| 变量名          | 说明                             | 默认值                      | 必填 | 备注   |
-| --------------- | -------------------------------- | --------------------------- | ---- | ------ |
-| `BACKEND`       | 转换后端服务地址                 | `https://url.v1.mk`         | ❌   |        |
-| `LOCK_BACKEND`  | 是否锁定后端服务                 | `false`                     | ❌   |        |
-| `REMOTE_CONFIG` | 自定义远程配置<br>(支持多行配置) | `https://xxxxx1`            | ❌   |        |
-| `SHORT_SERVER`  | 自定义短链服务                   | `https://short.looby.us.kg` | ❌   | 测试中 |
+| 变量名          | 说明                             | 默认值              | 必填 | 备注                               |
+| --------------- | -------------------------------- | ------------------- | ---- | ---------------------------------- |
+| `BACKEND`       | 转换后端服务地址                 | `https://url.v1.mk` | ❌   |                                    |
+| `LOCK_BACKEND`  | 是否锁定后端服务                 | `false`             | ❌   |                                    |
+| `REMOTE_CONFIG` | 自定义远程配置<br>(支持多行配置) | `https://xxxxx1`    | ❌   |                                    |
+| `DB`            | 短链服务数据库                   | 无                  | ❌   | 当绑定数据库时，会自动启用短链服务 |
 
 ## 📝 使用说明
 
@@ -86,11 +86,33 @@ a small tool that provides confusion conversion subscriptions
 - Worker 部署：`https://your-worker-name.your-subdomain.workers.dev`
 - Pages 部署：`https://your-project-name.pages.dev`
 
-### 🔗 自部署短链服务(测试中)
+### 🔗 短链服务
 
 短链服务用于将较长的订阅链接转换为简短的 URL，便于分享和使用。
 
-[短链服务部署文档](https://github.com/jwyGithub/cloudflare-workers/tree/main/packages/short-url)
+#### 💾 数据库
+
+- 表名称：`short_url`
+- 字段：
+    - `id`：自增主键
+    - `short_code`：短链码
+    - `short_url`：短链 URL
+    - `long_url`：原始订阅链接
+
+#### 💾 数据库结构
+
+```sql
+CREATE TABLE IF NOT EXISTS short_url (
+    id INTEGER PRIMARY KEY,
+    short_code TEXT,
+    short_url TEXT,
+    long_url TEXT
+);
+```
+
+#### 💾 数据库部署文档
+
+[Cloudflare D1](https://developers.cloudflare.com/d1/get-started/)
 
 ## 🤝 贡献指南
 
@@ -118,7 +140,7 @@ a small tool that provides confusion conversion subscriptions
 
     - 优化用户界面
 
-- 🔗 短链功能(测试中)
+- 🔗 短链功能(已支持)
 
     - 支持订阅链接转短链
     - 自定义短链别名

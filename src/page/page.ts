@@ -7,9 +7,11 @@ import { style } from './style/style';
 export function showPage(request: Request, env: Env): Response {
     const remoteConfig = getRemoteConfig(env);
     const backendConfig = getBackendConfig(request, env);
-    const shortServeConfig = getShortServeConfig(env);
+    const shortServeConfig = getShortServeConfig(request, env);
     const targetConfig = getTargetConfig();
     const advancedConfig = getAdvancedConfig();
+
+    const hasDBConfig = env.DB !== undefined;
 
     const html = `  
     <!DOCTYPE html>
@@ -114,7 +116,7 @@ export function showPage(request: Request, env: Env): Response {
                             </sub-form-item>
 
                             <sub-form-item label="短链地址">
-                                <sub-select key="shortServe" filterable></sub-select>
+                                <sub-select key="shortServe" filterable placeholder="${!hasDBConfig ? '未配置数据库' : ''}"></sub-select>
                             </sub-form-item>
 
                             <sub-form-item label="定制订阅">
@@ -225,6 +227,8 @@ export function showPage(request: Request, env: Env): Response {
                         #form = this.#$('#sub-convert-form');
                         #formItems = this.#form.querySelectorAll('sub-form-item');
 
+                        #headerIcon = this.#$('.header__icon');
+
                         constructor() {
                             this.#init();
                             this.#bindEvents();
@@ -239,6 +243,11 @@ export function showPage(request: Request, env: Env): Response {
                                     if (type && ['sub-select', 'sub-checkbox'].includes(type)) {
                                         formItem.setAttribute('options', JSON.stringify(formConfig[formItemKey].options));
                                     }
+
+                                    if(formItemKey === 'shortServe' && ${!hasDBConfig}) {
+                                        formItem.setAttribute('disabled', 'true');
+                                    }
+
                                     formItem.setAttribute('placeholder', formConfig[formItemKey]?.placeholder ?? '');
                                     if (formConfig[formItemKey]?.disabled) {
                                         formItem.setAttribute('disabled', '');
@@ -250,6 +259,12 @@ export function showPage(request: Request, env: Env): Response {
                         }
 
                         #bindEvents() {
+
+                            this.#headerIcon.addEventListener('click', () => {
+                                window.open('https://github.com/jwyGithub/sub-convert');
+                            });
+
+
                             this.#form.addEventListener('form:change', e => {
                                 this.#model[e.detail.key] = e.detail.value;
                                 this.#form.setAttribute('model', JSON.stringify(this.#model));
@@ -397,3 +412,4 @@ export function showPage(request: Request, env: Env): Response {
         })
     });
 }
+
