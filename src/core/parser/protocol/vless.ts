@@ -65,11 +65,12 @@ export class VlessParser extends Faker {
         this.#confuseLink = this.#confuseConfig.href!;
     }
 
-    public restoreClash(proxy: Record<string, string | number>, ps: string): Record<string, string | number> {
+    public restoreClash(proxy: Record<string, any>, ps: string): Record<string, any> {
         proxy.name = ps;
         proxy.server = this.originConfig.hostname ?? '';
         proxy.port = Number(this.originConfig?.port ?? 0);
         proxy.uuid = this.originConfig.username ?? '';
+        proxy.alpn = proxy.alpn ? proxy.alpn?.map((i: string) => decodeURIComponent(i)) : proxy.alpn;
         return proxy;
     }
 
@@ -80,6 +81,9 @@ export class VlessParser extends Faker {
         outbound.uuid = this.originConfig.username ?? '';
         if (outbound.tls?.server_name) {
             outbound.tls.server_name = this.originConfig.hostname ?? '';
+        }
+        if (outbound.tls?.alpn) {
+            outbound.tls.alpn = outbound.tls.alpn.map((i: string) => decodeURIComponent(i));
         }
         return outbound;
     }
@@ -130,3 +134,4 @@ export class VlessParser extends Faker {
         return this.#confuseConfig;
     }
 }
+
