@@ -1,4 +1,5 @@
 import type { UrlService } from '../services/url.service';
+import { getTargetConfig } from '../page/config/targetConfig';
 import { ResponseUtil } from '../shared/response';
 
 export class UrlController {
@@ -11,8 +12,11 @@ export class UrlController {
                 return ResponseUtil.error('Unsupported client type');
             }
 
-            if (!['clash', 'clashr', 'singbox'].includes(convertType)) {
-                return ResponseUtil.error('Unsupported client type, support list: clash, clashr, singbox');
+            const targetConfig = getTargetConfig();
+            const supportList = targetConfig.map(item => item.value);
+
+            if (!supportList.includes(convertType)) {
+                return ResponseUtil.error(`Unsupported client type, support list: ${supportList.join(', ')}`);
             }
 
             const subConfig = await this.service.toSub(request, env, convertType);

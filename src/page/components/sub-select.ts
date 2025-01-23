@@ -6,7 +6,6 @@ export function SubSelect(): string {
     return `
     <script>
         class SubSelect extends HTMLElement {
-           
             static get observedAttributes() {
                 return ['value', 'options', 'placeholder', 'disabled', 'filterable'];
             }
@@ -42,7 +41,6 @@ export function SubSelect(): string {
                 }
             }
 
-        
             #init() {
                 this.state = {
                     isOpen: false,
@@ -53,7 +51,7 @@ export function SubSelect(): string {
                 this.#render();
             }
 
-             #injectElement() {
+            #injectElement() {
                 const template = document.createElement('div');
                 template.className = 'sub-select';
 
@@ -103,8 +101,6 @@ export function SubSelect(): string {
                 // 绑定事件
                 this.#bindEvents(wrapper, input, arrow, dropdown);
             }
-
-            
 
             #injectStyle() {
                 const style = document.createElement('style');
@@ -159,6 +155,10 @@ export function SubSelect(): string {
                     .sub-select__input_disabled {
                         cursor: not-allowed;
                         color: #c0c4cc;
+                    }
+
+                    .sub-select__input_placeholder {
+                        color: var(--text-secondary);
                     }
 
                     .sub-select__arrow {
@@ -238,12 +238,6 @@ export function SubSelect(): string {
                 this.shadowRoot.appendChild(style);
             }
 
-           
-
-            
-
-        
-
             #bindEvents(wrapper, input, arrow, dropdown) {
                 if (this.hasAttribute('disabled')) return;
 
@@ -254,16 +248,18 @@ export function SubSelect(): string {
                     arrow.classList.remove('sub-select__arrow_active');
                 };
 
-
                 // 添加全局点击事件监听
-                const handleClickOutside = (event) => {
+                const handleClickOutside = event => {
                     const isClickInside = wrapper.contains(event.target) || dropdown.contains(event.target);
                     if (!isClickInside && this.state.isOpen) {
                         closeDropdown();
-                        if (this.state.value) {
-                            const option = this.state.options.find(opt => opt.value === this.state.value);
-                            if (option) {
-                                input.value = option.label;
+                        if (this.hasAttribute('filterable')) {
+                            // 如果没有输入新的值，恢复原来的值
+                            if (!this.state.filterValue) {
+                                const option = this.state.options.find(opt => opt.value === this.state.value);
+                                if (option) {
+                                    input.value = option.label;
+                                }
                             }
                         }
                         this.state.filterValue = '';
@@ -281,10 +277,13 @@ export function SubSelect(): string {
                 const toggleDropdown = () => {
                     if (this.state.isOpen) {
                         closeDropdown();
-                        if (this.state.value) {
-                            const option = this.state.options.find(opt => opt.value === this.state.value);
-                            if (option) {
-                                input.value = option.label;
+                        if (this.hasAttribute('filterable')) {
+                            // 如果没有输入新的值，恢复原来的值
+                            if (!this.state.filterValue) {
+                                const option = this.state.options.find(opt => opt.value === this.state.value);
+                                if (option) {
+                                    input.value = option.label;
+                                }
                             }
                         }
                         this.state.filterValue = '';
@@ -300,6 +299,15 @@ export function SubSelect(): string {
                         dropdown.classList.add('sub-select__dropdown_visible');
                         wrapper.classList.add('sub-select__wrapper_active');
                         arrow.classList.add('sub-select__arrow_active');
+
+                        // 如果是可过滤的，保存当前值为 placeholder 并清空输入框
+                        if (this.hasAttribute('filterable')) {
+                            const currentValue = input.value;
+                            input.placeholder = currentValue;
+                            input.value = '';
+                            input.focus();
+                        }
+
                         this.#renderOptions(dropdown);
                     }
                 };
@@ -313,10 +321,13 @@ export function SubSelect(): string {
                 document.addEventListener('sub-select-toggle', e => {
                     if (e.detail.currentSelect !== this && this.state.isOpen) {
                         closeDropdown();
-                        if (this.state.value) {
-                            const option = this.state.options.find(opt => opt.value === this.state.value);
-                            if (option) {
-                                input.value = option.label;
+                        if (this.hasAttribute('filterable')) {
+                            // 如果没有输入新的值，恢复原来的值
+                            if (!this.state.filterValue) {
+                                const option = this.state.options.find(opt => opt.value === this.state.value);
+                                if (option) {
+                                    input.value = option.label;
+                                }
                             }
                         }
                         this.state.filterValue = '';
@@ -338,23 +349,33 @@ export function SubSelect(): string {
 
             #renderOptions(dropdown) {
                 dropdown.innerHTML = '';
-                let options = this.state.options;
+                let options = [...this.state.options];  // 创建一个副本，避免直接修改原数组
 
                 // 如果是过滤模式且有输入值
                 if (this.hasAttribute('filterable') && this.state.filterValue) {
-                    // 清空下拉框，只显示当前输入的值
-                    const customOption = document.createElement('div');
-                    customOption.className = 'sub-select__option';
-                    customOption.textContent = this.state.filterValue;
-                    customOption.addEventListener('click', e => {
-                        e.stopPropagation();
-                        this.#selectOption({
-                            value: this.state.filterValue,
-                            label: this.state.filterValue
+                    // 过滤匹配的选项
+                    const filteredOptions = options.filter(option => 
+                        option.label.toLowerCase().includes(this.state.filterValue.toLowerCase())
+                    );
+
+                    // 如果没有匹配的选项，添加自定义选项
+                    if (filteredOptions.length === 0) {
+                        const customOption = document.createElement('div');
+                        customOption.className = 'sub-select__option sub-select__option_custom';
+                        customOption.textContent = this.state.filterValue;
+                        customOption.addEventListener('click', e => {
+                            e.stopPropagation();
+                            this.#selectOption({
+                                value: this.state.filterValue,
+                                label: this.state.filterValue
+                            });
                         });
-                    });
-                    dropdown.appendChild(customOption);
-                    return;
+                        dropdown.appendChild(customOption);
+                        return;
+                    }
+
+                    // 显示过滤后的选项
+                    options = filteredOptions;
                 }
 
                 // 如果没有选项，显示空状态
@@ -392,8 +413,11 @@ export function SubSelect(): string {
 
                 // 如果是自定义选项，添加到选项列表中
                 if (!this.state.options.some(opt => opt.value === option.value)) {
-                    this.state.options.push(option);
+                    this.state.options = [...this.state.options, option];
                 }
+
+                // 清空过滤值
+                this.state.filterValue = '';
 
                 // 关闭下拉框
                 const wrapper = this.shadowRoot.querySelector('.sub-select__wrapper');
@@ -459,3 +483,4 @@ export function SubSelect(): string {
         customElements.define('sub-select', SubSelect);
     </script>`;
 }
+

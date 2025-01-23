@@ -24,10 +24,10 @@ export class Confuse {
     public async setSubUrls(request: Request): Promise<void> {
         const { searchParams } = new URL(request.url);
         const vpsUrl = searchParams.get('url');
+        const protocol = searchParams.get('protocol');
 
         const vps = vpsUrl!.split(/\||\n/).filter(Boolean);
-
-        this.parser = new Parser(vps);
+        this.parser = new Parser(vps, [], protocol);
 
         await this.parser.parse(vps);
 
@@ -54,3 +54,4 @@ export class Confuse {
         return this.parser?.vpsMap;
     }
 }
+

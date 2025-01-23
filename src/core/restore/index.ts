@@ -20,3 +20,4 @@ export class Restore {
         return singboxClient.getOriginConfig(this.confuse.vpsStore!);
     }
 }
+

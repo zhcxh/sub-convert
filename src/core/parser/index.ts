@@ -21,10 +21,12 @@ export class Parser extends Convert {
     private originUrls: Set<string> = new Set<string>();
 
     private vps: string[] = [];
+    private includeProtocol: string[] = [];
 
-    constructor(vps: string[], existedVps: string[] = []) {
+    constructor(vps: string[], existedVps: string[] = [], protocol: string | null = '') {
         super(existedVps);
         this.vps = vps;
+        this.includeProtocol = protocol ? JSON.parse(protocol) : [];
     }
 
     public async parse(vps: string[] = this.vps): Promise<void> {
@@ -34,15 +36,15 @@ export class Parser extends Convert {
             if (processVps) {
                 let parser: ParserType | null = null;
 
-                if (processVps.startsWith('vless://')) {
+                if (processVps.startsWith('vless://') && this.hasProtocol('vless')) {
                     parser = new VlessParser(processVps);
-                } else if (processVps.startsWith('vmess://')) {
+                } else if (processVps.startsWith('vmess://') && this.hasProtocol('vmess')) {
                     parser = new VmessParser(processVps);
-                } else if (processVps.startsWith('trojan://')) {
+                } else if (processVps.startsWith('trojan://') && this.hasProtocol('trojan')) {
                     parser = new TrojanParser(processVps);
-                } else if (processVps.startsWith('ss://')) {
+                } else if (processVps.startsWith('ss://') && this.hasProtocol('shadowsocks', 'shadowsocksr')) {
                     parser = new SsParser(processVps);
-                } else if (this.isHysteria2(processVps)) {
+                } else if (this.isHysteria2(processVps) && this.hasProtocol('hysteria', 'hysteria2', 'hy2')) {
                     parser = new Hysteria2Parser(processVps);
                 }
 
@@ -54,7 +56,7 @@ export class Parser extends Convert {
             if (v.startsWith('https://') || v.startsWith('http://')) {
                 const subContent = await fetchWithRetry(v, { retries: 3 }).then(r => r.data.text());
                 const subType = this.getSubType(subContent);
-                if (subType === 'base64') {
+                if (subType === 'base64' && subContent) {
                     this.updateExist(Array.from(this.originUrls));
                     const content = base64Decode(subContent);
                     await this.parse(content.split('\n').filter(Boolean));
@@ -92,6 +94,10 @@ export class Parser extends Convert {
         return vps.startsWith('hysteria2://') || vps.startsWith('hysteria://') || vps.startsWith('hy2://');
     }
 
+    private hasProtocol(...args: string[]): boolean {
+        return args.some(p => this.includeProtocol.includes(p));
+    }
+
     public get urls(): string[] {
         return Array.from(this.urlSet);
     }
@@ -100,3 +106,4 @@ export class Parser extends Convert {
         return this.vpsStore;
     }
 }
+

@@ -1,5 +1,5 @@
-import { SubButton, SubCheckbox, SubForm, SubFormItem, SubInput, SubMessage, SubSelect, SubTextarea } from './components';
-import { getAdvancedConfig, getBackendConfig, getRemoteConfig, getShortServeConfig, getTargetConfig } from './config';
+import { SubButton, SubCheckbox, SubForm, SubFormItem, SubInput, SubMessage, SubMultiSelect, SubSelect, SubTextarea } from './components';
+import { getAdvancedConfig, getBackendConfig, getProtocolConfig, getRemoteConfig, getShortServeConfig, getTargetConfig } from './config';
 import { theme } from './script/theme';
 import { layout } from './style/layout';
 import { style } from './style/style';
@@ -10,6 +10,7 @@ export function showPage(request: Request, env: Env): Response {
     const shortServeConfig = getShortServeConfig(request, env);
     const targetConfig = getTargetConfig();
     const advancedConfig = getAdvancedConfig();
+    const protocolConfig = getProtocolConfig();
 
     const hasDBConfig = env.DB !== undefined;
 
@@ -111,6 +112,10 @@ export function showPage(request: Request, env: Env): Response {
                                 <sub-select key="backend" filterable></sub-select>
                             </sub-form-item>
 
+                            <sub-form-item label="包含节点">
+                                <sub-multi-select key="protocol"></sub-multi-select>
+                            </sub-form-item>
+
                             <sub-form-item label="高级选项">
                                 <sub-checkbox key="advanced" span="5"></sub-checkbox>
                             </sub-form-item>
@@ -176,6 +181,7 @@ export function showPage(request: Request, env: Env): Response {
                 ${SubInput()}
                 ${SubTextarea()}
                 ${SubSelect()}
+                ${SubMultiSelect()}
                 ${SubCheckbox()}
                 ${SubFormItem()}
                 ${SubForm()}
@@ -196,6 +202,10 @@ export function showPage(request: Request, env: Env): Response {
                             type: 'sub-select',
                             options: ${JSON.stringify(backendConfig)}
                         },
+                        protocol: {
+                            type: 'sub-multi-select',
+                            options: ${JSON.stringify(protocolConfig)}
+                        },
                         advanced: {
                             type: 'sub-checkbox',
                             options: ${JSON.stringify(advancedConfig)}
@@ -211,6 +221,7 @@ export function showPage(request: Request, env: Env): Response {
                             target: '${targetConfig[0].value}',
                             config: '${remoteConfig[0].value}',
                             backend: '${backendConfig[0].value}',
+                            protocol: '${JSON.stringify(protocolConfig.map(item => item.value))}',
                             advanced: ['emoji', 'new_name'],
                             shortServe: '${shortServeConfig[0]?.value ?? ''}',
 
@@ -240,7 +251,7 @@ export function showPage(request: Request, env: Env): Response {
                                 if (formItem) {
                                     const formItemKey = formItem.getAttribute('key');
                                     const type = formConfig[formItemKey]?.type;
-                                    if (type && ['sub-select', 'sub-checkbox'].includes(type)) {
+                                    if (type && ['sub-select', 'sub-checkbox', 'sub-multi-select'].includes(type)) {
                                         formItem.setAttribute('options', JSON.stringify(formConfig[formItemKey].options));
                                     }
 
@@ -285,7 +296,8 @@ export function showPage(request: Request, env: Env): Response {
                                 url.searchParams.set('list', false);
                                 url.searchParams.set('scv', false);
                                 url.searchParams.set('fdn', false);
-
+                                url.searchParams.set('protocol', Array.isArray(this.#model.protocol) ? JSON.stringify(this.#model.protocol) : this.#model.protocol);
+                                
                                 const advancedOptions = this.#getAdvancedOptions(this.#model);
 
                                 advancedOptions.forEach(option => {

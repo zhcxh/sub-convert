@@ -11,7 +11,7 @@ export class ClashClient {
     public getOriginConfig(vpsMap: VpsMap): ClashType {
         try {
             this.confuseConfig.proxies = this.restoreProxies(this.confuseConfig.proxies, vpsMap);
-            this.confuseConfig['proxy-groups'] = this.confuseConfig['proxy-groups'].map(group => {
+            this.confuseConfig['proxy-groups'] = this.confuseConfig?.['proxy-groups']?.map(group => {
                 if (group.proxies) {
                     group.proxies = this.updateProxiesGroups(group.proxies);
                 }
@@ -57,3 +57,4 @@ export class ClashClient {
         }
     }
 }
+
