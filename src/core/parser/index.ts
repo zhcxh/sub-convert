@@ -95,7 +95,7 @@ export class Parser extends Convert {
     }
 
     private hasProtocol(...args: string[]): boolean {
-        return args.some(p => this.includeProtocol.includes(p));
+        return this.includeProtocol.length === 0 || args.some(p => this.includeProtocol.includes(p));
     }
 
     public get urls(): string[] {
