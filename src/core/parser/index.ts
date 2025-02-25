@@ -55,10 +55,9 @@ export class Parser extends Convert {
 
             if (v.startsWith('https://') || v.startsWith('http://')) {
                 const subContent = await fetchWithRetry(v, { retries: 3 }).then(r => r.data.text());
-                const subType = this.getSubType(subContent);
+                const { subType, content } = this.getSubType(subContent);
                 if (subType === 'base64' && subContent) {
                     this.updateExist(Array.from(this.originUrls));
-                    const content = base64Decode(subContent);
                     await this.parse(content.split('\n').filter(Boolean));
                 }
             }
@@ -71,20 +70,35 @@ export class Parser extends Convert {
         this.vpsStore.set(parser.confusePs, parser);
     }
 
-    private getSubType(content: string): SubType {
+    private getSubType(content: string): {
+        subType: SubType;
+        content: string;
+    } {
         try {
-            base64Decode(content);
-            return 'base64';
+            const subContent = base64Decode(content);
+            return {
+                subType: 'base64',
+                content: subContent
+            };
         } catch {
             try {
-                load(content);
-                return 'yaml';
+                const subContent = load(content) as string;
+                return {
+                    subType: 'yaml',
+                    content: subContent
+                };
             } catch {
                 try {
-                    JSON.parse(content);
-                    return 'json';
+                    const subContent = JSON.parse(content);
+                    return {
+                        subType: 'json',
+                        content: JSON.stringify(subContent)
+                    };
                 } catch {
-                    return 'unknown';
+                    return {
+                        subType: 'unknown',
+                        content
+                    };
                 }
             }
         }
