@@ -1,6 +1,6 @@
 # sub-convert
 
-a small tool that provides confusion conversion subscriptions
+一个防止节点泄漏的订阅转换小工具
 
 ## ✨ 功能特点
 
