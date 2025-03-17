@@ -16,7 +16,7 @@ export class Confuse {
 
     private clashClient: ClashClient = new ClashClient();
     private singboxClient: SingboxClient = new SingboxClient();
-    private v2rayClient: V2RayClient = new V2RayClient();
+    private v2rayClient: V2RayClient = new V2RayClient(this.vps);
 
     constructor(env: Env) {
         this.chunkCount = Number(env.CHUNK_COUNT ?? DEFAULT_CONFIG.CHUNK_COUNT);

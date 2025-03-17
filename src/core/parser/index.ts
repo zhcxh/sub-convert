@@ -119,5 +119,9 @@ export class Parser extends Convert {
     public get vpsMap(): Map<string, ParserType> {
         return this.vpsStore;
     }
+
+    public get originVps(): string[] {
+        return Array.from(this.originUrls);
+    }
 }
 
