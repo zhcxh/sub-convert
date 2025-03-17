@@ -118,6 +118,10 @@ CREATE TABLE IF NOT EXISTS short_url (
 
 [Cloudflare D1](https://developers.cloudflare.com/d1/get-started/)
 
+#### 💾 工作原理
+
+<p><img src="./src/doc/screen/flow.svg" width="200px" height="auto" alt="工作原理" /></p>
+
 ## 🤝 贡献指南
 
 欢迎提交 Issue 和 Pull Request！
