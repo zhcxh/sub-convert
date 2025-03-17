@@ -33,7 +33,17 @@ export class UrlService {
                 });
             }
 
-            return ResponseUtil.error('Unsupported client type, support list: clash, clashr');
+            if (convertType === 'v2ray') {
+                const originConfig = await restore.getV2RayConfig();
+                return new Response(originConfig, {
+                    headers: new Headers({
+                        'Content-Type': 'text/plain; charset=UTF-8',
+                        'Cache-Control': 'no-store'
+                    })
+                });
+            }
+
+            return ResponseUtil.error('Unsupported client type, support list: clash, singbox, v2ray');
         } catch (error: any) {
             throw new Error(error.message || 'Invalid request');
         }

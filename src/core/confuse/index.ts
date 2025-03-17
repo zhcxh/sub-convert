@@ -1,12 +1,14 @@
-import type { ClashType, SingboxType, VpsMap } from '../../types';
+import type { ClashType, SingboxType, V2RayType, VpsMap } from '../../types';
 import { DEFAULT_CONFIG } from '../../config';
 import { getUrlGroup } from '../../shared';
 import { Parser } from '../parser';
 import { ClashClient } from './client/clash';
 import { SingboxClient } from './client/singbox';
+import { V2RayClient } from './client/v2ray';
 
 export class Confuse {
     private urls: string[] = [];
+    private vps: string[] = [];
 
     private chunkCount: number = Number(DEFAULT_CONFIG.CHUNK_COUNT);
     private backend: string = DEFAULT_CONFIG.BACKEND;
@@ -14,6 +16,7 @@ export class Confuse {
 
     private clashClient: ClashClient = new ClashClient();
     private singboxClient: SingboxClient = new SingboxClient();
+    private v2rayClient: V2RayClient = new V2RayClient();
 
     constructor(env: Env) {
         this.chunkCount = Number(env.CHUNK_COUNT ?? DEFAULT_CONFIG.CHUNK_COUNT);
@@ -28,6 +31,7 @@ export class Confuse {
 
         const vps = vpsUrl!.split(/\||\n/).filter(Boolean);
         this.parser = new Parser(vps, [], protocol);
+        this.vps = vps;
 
         await this.parser.parse(vps);
 
@@ -48,6 +52,10 @@ export class Confuse {
 
     public async getSingboxConfig(): Promise<SingboxType> {
         return await this.singboxClient.getConfig(this.urls);
+    }
+
+    public async getV2RayConfig(): Promise<V2RayType> {
+        return await this.v2rayClient.getConfig(this.urls, this.vps);
     }
 
     get vpsStore(): VpsMap | undefined {

@@ -30,8 +30,8 @@
 ### 🔄 支持转换的客户端
 
 - ✅ Clash
-- ✅ ClashR
 - ✅ sing-box
+- ✅ v2ray
 
 ## ⚙️ 配置说明
 
