@@ -122,6 +122,10 @@ CREATE TABLE IF NOT EXISTS short_url (
 
 <p><img src="./src/doc/screen/flow.svg" width="200px" height="auto" alt="工作原理" /></p>
 
+#### 💾 提示
+
+- `只有使用部署的worker服务，才有混淆的效果，使用其他后端转换服务没有混淆的效果`
+
 ## 🤝 贡献指南
 
 欢迎提交 Issue 和 Pull Request！
