@@ -1,0 +1,28 @@
+name: Upstream Sync
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # 每天午夜运行一次，可根据需要调整时间
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  sync_with_upstream:
+    name: Sync with Upstream
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }}  # 确保只在 fork 的仓库中运行
+
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v3
+
+      - name: Sync Upstream
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4  # 使用第三方 Action
+        with:
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}  # 授权令牌
+          upstream_sync_repo: jwyGithub/sub-convert  # 上游仓库路径，例如 "username/original-repo"
+          upstream_sync_branch: main  # 上游仓库分支
+          target_sync_branch: main  # 本地仓库分支
+          test_mode: false  # 是否为测试模式
